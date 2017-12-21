@@ -3,7 +3,7 @@
  * Sniff to prohibit some file comment tags on WooCommerce
  */
 
-namespace WooCommerce\Sniffs\Core\Commenting;
+namespace WooCommerce\Core\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
