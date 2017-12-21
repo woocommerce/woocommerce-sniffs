@@ -1,0 +1,25 @@
+{
+    "name": "woocommerce/woocommerce-sniffs",
+    "description": "WooCommerce sniffs",
+    "type": "phpcodesniffer-standard",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Claudio Sanches",
+            "email": "claudio@automattic.com"
+        }
+    ],
+    "keywords": [
+        "phpcs",
+        "standards",
+        "WordPress",
+        "WooCommerce"
+    ],
+    "require": {
+        "php": ">=7.0",
+        "squizlabs/php_codesniffer": "^3.0.2"
+    },
+    "suggest": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3"
+    }
+}
