@@ -46,6 +46,7 @@ class CommentTagsSniff implements Sniff
             '@category'  => 'CategoryTag',
             '@license'   => 'LicenseTag',
             '@copyright' => 'CopyrightTag',
+            '@access'    => 'AccessTag',
         ];
     }
 
