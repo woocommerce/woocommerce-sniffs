@@ -1,6 +1,6 @@
 # WooCommerce Sniffs
 
-Initial version.
+WooCommerce Core - PHP Code Sniffs.
 
 ## TODO:
 
