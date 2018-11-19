@@ -58,10 +58,10 @@ class CommentTagsSniff implements Sniff
      */
     protected function getErrorMessage(string $key): string
     {
-        if ( $key === '@category' ) {
+        if ($key === '@category') {
             return "@category is deprecated, use @package instead";
         }
-        
+
         return "{$key} tags are prohibited";
     }
 
