@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="WooCommerce Sniffs">
-	<description>WooCommerce Sniffes dev ruleset.</description>
+	<description>WooCommerce Sniffs dev ruleset.</description>
 
 	<!-- Configs -->
 	<config name="testVersion" value="7.0-" />
@@ -8,3 +8,4 @@
 	<!-- Rules -->
 	<rule ref="PSR2" />
 </ruleset>
+
