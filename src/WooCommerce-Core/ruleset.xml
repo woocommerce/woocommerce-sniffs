@@ -3,11 +3,7 @@
 	<description>WooCommerce Core coding standards.</description>
 
 	<!-- PHPCompatibility -->
-	<rule ref="PHPCompatibility">
-		<exclude name="PHPCompatibility.PHP.NewFunctions.hash_equalsFound" />
-		<exclude name="PHPCompatibility.PHP.NewInterfaces.jsonserializableFound" />
-		<exclude name="PHPCompatibility.PHP.NewKeywords.t_namespaceFound" />
-	</rule>
+	<rule ref="PHPCompatibilityWP" />
 
 	<!-- WordPress -->
 	<rule ref="WordPress">
