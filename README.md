@@ -23,14 +23,14 @@ PHPCS config file:
 ```xml
 <?xml version="1.0"?>
 <ruleset name="WooCommerce Coding Standards">
-    <description>My projects ruleset.</description>
+	<description>My projects ruleset.</description>
 	
-    <!-- Configs -->
+	<!-- Configs -->
 	<config name="minimum_supported_wp_version" value="4.7" />
 	<config name="testVersion" value="5.2-" />
 
-    <!-- Rules -->
-    <rule ref="WooCommerce-Core" />
+	<!-- Rules -->
+	<rule ref="WooCommerce-Core" />
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
