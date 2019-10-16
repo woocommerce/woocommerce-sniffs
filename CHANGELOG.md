@@ -4,9 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.8] - 2019-10-16
+### Changed
+- Updated "wp-coding-standards/wpcs" to 2.1.1.
+- Updated "phpcompatibility/phpcompatibility-wp" to 2.1.
+### Added
+- White flag `wc_make_phone_clickable()` on `WordPress.Security.EscapeOutput`.
+
 ## [0.0.7] - 2019-08-23
 ### Changed
-- Updated WPCS to 2.1.
+- Updated "wp-coding-standards/wpcs" to 2.1.
 ### Added
 - White flag `wc_query_string_form_fields()` on `WordPress.Security.EscapeOutput`.
 
@@ -42,7 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial code to throw warnings when using `@author`, `@category`, `@license` and `@copyright` tags.
 
-[Unreleased]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.7...HEAD
+[Unreleased]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.8...HEAD
+[0.0.8]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.7...0.0.8
 [0.0.7]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.6...0.0.7
 [0.0.6]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.5...0.0.6
 [0.0.5]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.4...0.0.5
