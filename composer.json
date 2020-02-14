@@ -18,7 +18,7 @@
     "require": {
         "php": ">=7.0",
         "wp-coding-standards/wpcs": "2.2.0",
-        "dealerdirect/phpcodesniffer-composer-installer": "0.5.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "0.6.2",
         "phpcompatibility/phpcompatibility-wp": "2.1.0"
     }
 }
