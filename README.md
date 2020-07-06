@@ -27,7 +27,7 @@ PHPCS config file:
 	
 	<!-- Configs -->
 	<config name="minimum_supported_wp_version" value="4.7" />
-	<config name="testVersion" value="7.0-" />
+	<config name="testVersion" value="7.2-" />
 
 	<!-- Rules -->
 	<rule ref="WooCommerce-Core" />
