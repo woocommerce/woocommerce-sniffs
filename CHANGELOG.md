@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2020-08-06
+### Added
+- Added `WooCommerce.Functions.InternalInjectionMethod` sniff.
+### Changed
+- Renamed `WooCommerce-Core.Commenting.CommentTagsSniff` to `WooCommerce.Commenting.CommentTagsSniff`.
+- Updated "wp-coding-standards/wpcs" to 2.3.0.
+- Updated "dealerdirect/phpcodesniffer-composer-installer" to 0.7.0.
+
 ## [0.0.10] - 2020-04-07
 ### Changed
 - Updated "wp-coding-standards/wpcs" to 2.2.1.
@@ -58,7 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial code to throw warnings when using `@author`, `@category`, `@license` and `@copyright` tags.
 
-[Unreleased]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.10...HEAD
+[Unreleased]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.10...0.1.0
 [0.0.10]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.9...0.0.10
 [0.0.9]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.8...0.0.9
 [0.0.8]: https://github.com/woocommerce/woocommerce-sniffs/compare/0.0.7...0.0.8
