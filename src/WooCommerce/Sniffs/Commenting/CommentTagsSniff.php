@@ -3,7 +3,7 @@
  * Sniff to prohibit some file comment tags on WooCommerce
  */
 
-namespace WooCommerce\Core\Sniffs\Commenting;
+namespace WooCommerce\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -46,7 +46,7 @@ class CommentTagsSniff implements Sniff
             '@category'  => 'CategoryTag',
             '@license'   => 'LicenseTag',
             '@copyright' => 'CopyrightTag',
-            '@access'    => 'AccessTag',
+            '@access'    => 'AccessTag'
         ];
     }
 
