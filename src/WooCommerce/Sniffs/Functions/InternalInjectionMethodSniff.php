@@ -9,7 +9,8 @@ use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
 
-class InternalInjectionMethodSniff implements Sniff {
+class InternalInjectionMethodSniff implements Sniff
+{
 
     /**
      * The name of the method that we're using for injection.
@@ -23,8 +24,9 @@ class InternalInjectionMethodSniff implements Sniff {
      *
      * @return array
      */
-    public function register(): array {
-        return [ T_FUNCTION ];
+    public function register(): array
+    {
+        return [T_FUNCTION];
     }
 
     /**
@@ -33,9 +35,10 @@ class InternalInjectionMethodSniff implements Sniff {
      * @param File $phpcsFile The file being scanned.
      * @param int  $stackPtr The position of the current token in the stack passed in $tokens.
      */
-    public function process(File $phpcsFile, $stackPtr) {
+    public function process(File $phpcsFile, $stackPtr)
+    {
         // If we have no injection method defined we can't actually do anything.
-        if ( empty( $this->injectionMethod ) ) {
+        if (empty($this->injectionMethod)) {
             return;
         }
 
@@ -47,16 +50,16 @@ class InternalInjectionMethodSniff implements Sniff {
 
         // We're only interested in class methods.
         $classDefinition = $phpcsFile->getCondition($stackPtr, T_CLASS);
-        if ( false === $classDefinition ) {
+        if (false === $classDefinition) {
             return;
         }
 
         $methodProperties = $phpcsFile->getMethodProperties($stackPtr);
         if (!$methodProperties['is_final']) {
-            $phpcsFile->addError('The injection method must be marked final', $stackPtr, 'MissingFinal' );
+            $phpcsFile->addError('The injection method must be marked final', $stackPtr, 'MissingFinal');
         }
         if ('public' !== $methodProperties['scope']) {
-            $phpcsFile->addError('The injection method must be marked public', $stackPtr, 'MissingPublic' );
+            $phpcsFile->addError('The injection method must be marked public', $stackPtr, 'MissingPublic');
         }
 
         $this->checkAccessTag($phpcsFile, $stackPtr);
@@ -68,16 +71,17 @@ class InternalInjectionMethodSniff implements Sniff {
      * @param File $phpcsFile The file being scanned.
      * @param int  $stackPtr The position of the current token in the stack passed in $tokens.
      */
-    protected function checkAccessTag(File $phpcsFile, $stackPtr) {
+    protected function checkAccessTag(File $phpcsFile, $stackPtr)
+    {
         $tokens = $phpcsFile->getTokens();
 
         $find = Tokens::$methodPrefixes;
         $find[] = T_WHITESPACE;
 
-        $foundAccessTag = false;
+        $foundInternalTag = false;
 
         $commentEnd = $phpcsFile->findPrevious($find, ($stackPtr - 1), null, true);
-        if ( false !== $commentEnd ) {
+        if (false !== $commentEnd) {
             if ($tokens[$commentEnd]['code'] === T_COMMENT) {
                 // Inline comments might just be closing comments for
                 // control structures or functions instead of function comments
@@ -92,24 +96,20 @@ class InternalInjectionMethodSniff implements Sniff {
             if ($tokens[$commentEnd]['code'] === T_DOC_COMMENT_CLOSE_TAG) {
                 $commentStart = $tokens[$commentEnd]['comment_opener'];
                 foreach ($tokens[$commentStart]['comment_tags'] as $tag) {
-                    if('@access' !== $tokens[$tag]['content']) {
-                        continue;
-                    }
-
-                    $string = $phpcsFile->findNext(T_DOC_COMMENT_STRING, $tag, $commentEnd);
-                    if (false === $string) {
-                        continue;
-                    }
-
-                    if ( 'private' === $tokens[$string]['content'] ) {
-                        $foundAccessTag = true;
+                    if ('@internal' === $tokens[$tag]['content']) {
+                        $foundInternalTag = true;
+                        break;
                     }
                 }
             }
         }
 
-        if (!$foundAccessTag) {
-            $phpcsFile->addError("The injection method requires an '@access private' annotation", $stackPtr, 'MissingAccessTag');
+        if (!$foundInternalTag) {
+            $phpcsFile->addError(
+                'The injection method requires an \'@internal\' annotation',
+                $stackPtr,
+                'MissingInternalTag'
+            );
         }
     }
 }
