@@ -58,25 +58,25 @@ class CommentHooksSniff implements Sniff
             return;
         }
 
-        $previous_comment = $phpcsFile->findPrevious( Tokens::$commentTokens, ( $stack_ptr - 1 ) );
+        $previous_comment = $phpcsFile->findPrevious(Tokens::$commentTokens, ($stack_ptr - 1));
 
-        if ( false !== $previous_comment ) {
-            if ( ( $tokens[ $previous_comment ]['line'] + 1 ) === $tokens[ $stack_ptr ]['line'] ) {
+        if (false !== $previous_comment) {
+            if (($tokens[ $previous_comment ]['line'] + 1) === $tokens[ $stack_ptr ]['line']) {
                 return;
             } else {
-                $next_non_whitespace = $phpcsFile->findNext( \T_WHITESPACE, ( $previous_comment + 1 ), $stack_ptr, true );
+                $next_non_whitespace = $phpcsFile->findNext(\T_WHITESPACE, ( $previous_comment + 1 ), $stack_ptr, true);
 
-                if ( false === $next_non_whitespace || $tokens[ $next_non_whitespace ]['line'] === $tokens[ $stack_ptr ]['line'] ) {
+                if (false === $next_non_whitespace || $tokens[ $next_non_whitespace ]['line'] === $tokens[ $stack_ptr ]['line']) {
                     // No non-whitespace found or next non-whitespace is on same line as hook call.
                     return;
                 }
-                unset( $next_non_whitespace );
+                unset($next_non_whitespace);
             }
         }
 
         // Found hooks but no doc comment.
-        $phpcsFile->addWarning(
-            sprintf( 'Documentation/comment needed for hook to explain what the hook does: %s', $tokens[ $stack_ptr ]['content'] ),
+        $phpcsFile->addError(
+            sprintf('Documentation/comment needed for hook to explain what the hook does: %s', $tokens[ $stack_ptr ]['content']),
             $stack_ptr,
             'MissingHooksComment'
         );
