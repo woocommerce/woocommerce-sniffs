@@ -50,36 +50,61 @@ class CommentHooksSniff implements Sniff
      * @param int                         $stackPtr  The position of the current token
      *                                               in the stack passed in $tokens.
      */
-    public function process(File $phpcsFile, $stack_ptr)
+    public function process(File $phpcsFile, $stackPtr)
     {
         $tokens = $phpcsFile->getTokens();
 
-        if (! in_array($tokens[ $stack_ptr ]['content'], $this->hooks)) {
+        if (! in_array($tokens[$stackPtr]['content'], $this->hooks)) {
             return;
         }
 
-        $previous_comment = $phpcsFile->findPrevious(Tokens::$commentTokens, ($stack_ptr - 1));
+        $previous_comment = $phpcsFile->findPrevious(Tokens::$commentTokens, ( $stackPtr - 1 ));
 
         if (false !== $previous_comment) {
-            if (($tokens[ $previous_comment ]['line'] + 1) === $tokens[ $stack_ptr ]['line']) {
-                return;
-            } else {
-                $next_non_whitespace = $phpcsFile->findNext(\T_WHITESPACE, ( $previous_comment + 1 ), $stack_ptr, true);
+            $correctly_placed = false;
 
-                if (false === $next_non_whitespace || $tokens[ $next_non_whitespace ]['line'] === $tokens[ $stack_ptr ]['line']) {
-                    // No non-whitespace found or next non-whitespace is on same line as hook call.
+            if (( $tokens[ $previous_comment ]['line'] + 1 ) === $tokens[ $stackPtr ]['line']) {
+                $correctly_placed = true;
+            }
+
+            if (true === $correctly_placed) {
+
+                if (\T_COMMENT === $tokens[ $previous_comment ]['code']) {
+                    $phpcsFile->addError(
+                        'A "hook" comment must be a "/**" style docblock comment.',
+                        $stackPtr,
+                        'HookCommentWrongStyle'
+                    );
+
+                    return;
+                } elseif (\T_DOC_COMMENT_CLOSE_TAG === $tokens[ $previous_comment ]['code']) {
+                    $comment_start = $phpcsFile->findPrevious(\T_DOC_COMMENT_OPEN_TAG, ( $previous_comment - 1 ));
+
+                    // Iterate through each comment to check for "@since" tag.
+                    foreach ($tokens[ $comment_start ]['comment_tags'] as $tag) {
+                        if ($tokens[$tag]['content'] === '@since') {
+                            return;
+                        }
+                    }
+
+                    $phpcsFile->addError(
+                        'Docblock comment was found for the hook but does not contain a "@since" versioning.',
+                        $stackPtr,
+                        'MissingSinceComment'
+                    );
+
                     return;
                 }
-                unset($next_non_whitespace);
             }
         }
 
-        // Found hooks but no doc comment.
+        // Found hook but no docblock comment.
         $phpcsFile->addError(
-            sprintf('Documentation/comment needed for hook to explain what the hook does: %s', $tokens[ $stack_ptr ]['content']),
-            $stack_ptr,
-            'MissingHooksComment'
+            'A hook was found, but was not accompanied by a docblock comment on the line above to clarify the meaning of the hook.',
+            $stackPtr,
+            'MissingHookComment'
         );
+
         return;
     }
 }
