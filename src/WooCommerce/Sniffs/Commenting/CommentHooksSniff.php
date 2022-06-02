@@ -70,11 +70,75 @@ class CommentHooksSniff implements Sniff
             if (true === $correctly_placed) {
 
                 if (\T_COMMENT === $tokens[ $previous_comment ]['code']) {
-                    $phpcsFile->addError(
+                    $fix = $phpcsFile->addFixableError(
                         'A "hook" comment must be a "/**" style docblock comment.',
                         $stackPtr,
                         'HookCommentWrongStyle'
                     );
+
+                    if ( $fix ) {
+                        $phpcsFile->fixer->beginChangeset();
+                        $current_ptr   = $stackPtr;
+                        $previous_line = (int) $tokens[ $stackPtr ]['line'] - 1;
+
+                        // Traverse up the pointer stack.
+                        while ( true ) {
+                            // The pointer has reached the previous line.
+                            if ( $tokens[ $stackPtr ]['line'] === $previous_line ) {
+                                // If it has an opening PHP tag, we skip to prevent issues.
+                                for ( $i = $stackPtr + 1; $i < $current_ptr; $i++ ) {
+                                    if ( '<?php' === trim( $tokens[ $i ]['content'] ) ) {
+                                        break 2;
+                                    }
+                                }
+
+                                $description = trim( str_replace( '//', '', $tokens[ $stackPtr ]['content'] ) );
+
+                                // Account for translators comments.
+                                if ( preg_match( '/\/\*\s*translators:.+\*\//i', $tokens[ $stackPtr - 1 ]['content'] ) ) {
+                                    break;
+                                }
+
+                                // Account for /*...*/ style comments.
+                                if ( preg_match( '/\/\*.+\*\//', $tokens[ $stackPtr - 1 ]['content'] ) ) {
+                                    $description = trim( str_replace( array( '/*', '*/' ), '', $tokens[ $stackPtr - 1 ]['content'] ) );
+                                    $phpcsFile->fixer->replaceToken( $stackPtr - 1, '' );
+                                } elseif ( preg_match( '/\*\//', $tokens[ $stackPtr - 1 ]['content'] ) ) {
+                                    $stack = $stackPtr - 1;
+
+                                    while ( true ) {
+                                        // Reached the comment start tag.
+                                        if ( preg_match( '/\/\*/', $tokens[ $stack ]['content'] ) ) {
+                                            $phpcsFile->fixer->replaceToken( $stack, '/**' . $phpcsFile->eolChar );
+                                            break 2;
+                                        }
+
+                                        $stack--;
+                                    }
+                                }
+
+                                if ( '' !== trim( $tokens[ $stackPtr + 1 ]['content'] ) ) {
+                                    $padding = '';
+                                } else {
+                                    $spaces    = strlen( $tokens[ $stackPtr + 1 ]['content'] );
+                                    $tabs      = floor( $spaces / 4 );
+                                    $remaining = str_repeat( ' ', ( $spaces % 4 ) );
+                                    $padding   = str_repeat( "\t", $tabs ) . $remaining;
+                                }
+
+                                if ( preg_match( '/\/\/\s*PHPCS:|WPCS:/i', $tokens[ $stackPtr ]['content'] ) ) {
+                                    $phpcsFile->fixer->addContent( $stackPtr, $phpcsFile->eolChar . $padding . '/**' . $phpcsFile->eolChar . $padding . ' * Hook' . $phpcsFile->eolChar . $padding . ' *' . $phpcsFile->eolChar . $padding . ' * @since' . $phpcsFile->eolChar . $padding . ' */' . $phpcsFile->eolChar );
+                                    break;
+                                }
+
+                                $phpcsFile->fixer->replaceToken( $stackPtr, $phpcsFile->eolChar . $padding . '/**' . $phpcsFile->eolChar . $padding . ' * ' . ucfirst( $description ) . $phpcsFile->eolChar . $padding . ' *' . $phpcsFile->eolChar . $padding . ' * @since' . $phpcsFile->eolChar . $padding . ' */' . $phpcsFile->eolChar );
+                                break;
+                            }
+
+                            $stackPtr--;
+                        }
+                        $phpcsFile->fixer->endChangeset();
+                    }
 
                     return;
                 } elseif (\T_DOC_COMMENT_CLOSE_TAG === $tokens[ $previous_comment ]['code']) {
@@ -87,11 +151,23 @@ class CommentHooksSniff implements Sniff
                         }
                     }
 
-                    $phpcsFile->addError(
+                    $fix = $phpcsFile->addFixableError(
                         'Docblock comment was found for the hook but does not contain a "@since" versioning.',
                         $stackPtr,
                         'MissingSinceComment'
                     );
+
+                    if ( $fix ) {
+                        $phpcsFile->fixer->beginChangeset();
+                        $comment_end = $phpcsFile->findPrevious( \T_DOC_COMMENT_CLOSE_TAG, $stackPtr );
+                        $spaces      = strlen( $tokens[ $comment_end - 1 ]['content'] );
+                        $tabs        = floor( $spaces / 4 );
+                        $remaining   = str_repeat( ' ', ( $spaces % 4 ) );
+                        $padding     = str_repeat( "\t", $tabs ) . $remaining;
+
+                        $phpcsFile->fixer->addContent( $comment_end - 3, $phpcsFile->eolChar . $padding . '* @since' );
+                        $phpcsFile->fixer->endChangeset();
+                    }
 
                     return;
                 }
@@ -99,11 +175,45 @@ class CommentHooksSniff implements Sniff
         }
 
         // Found hook but no docblock comment.
-        $phpcsFile->addError(
+        $fix = $phpcsFile->addFixableError(
             'A hook was found, but was not accompanied by a docblock comment on the line above to clarify the meaning of the hook.',
             $stackPtr,
             'MissingHookComment'
         );
+
+        if ( $fix ) {
+            $phpcsFile->fixer->beginChangeset();
+            $current_ptr   = $stackPtr;
+            $previous_line = (int) $tokens[ $stackPtr ]['line'] - 1;
+
+            // Traverse up the pointer stack.
+            while ( true ) {
+                // The pointer has reached the previous line.
+                if ( $tokens[ $stackPtr ]['line'] === $previous_line ) {
+                    // If it has an opening PHP tag, we skip to prevent issues.
+                    for ( $i = $stackPtr + 1; $i < $current_ptr; $i++ ) {
+                        if ( '<?php' === trim( $tokens[ $i ]['content'] ) ) {
+                            break 2;
+                        }
+                    }
+
+                    if ( '' !== trim( $tokens[ $stackPtr + 1 ]['content'] ) ) {
+                        $padding = '';
+                    } else {
+                        $spaces    = strlen( $tokens[ $stackPtr + 1 ]['content'] );
+                        $tabs      = floor( $spaces / 4 );
+                        $remaining = str_repeat( ' ', ( $spaces % 4 ) );
+                        $padding   = str_repeat( "\t", $tabs ) . $remaining;
+                    }
+
+                    $phpcsFile->fixer->addContent( $stackPtr, $phpcsFile->eolChar . $padding . '/**' . $phpcsFile->eolChar . $padding . ' * Hook' . $phpcsFile->eolChar . $padding . ' *' . $phpcsFile->eolChar . $padding . ' * @since' . $phpcsFile->eolChar . $padding . ' */' . $phpcsFile->eolChar );
+                    break;
+                }
+
+                $stackPtr--;
+            }
+            $phpcsFile->fixer->endChangeset();
+        }
 
         return;
     }
