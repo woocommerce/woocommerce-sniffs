@@ -68,7 +68,6 @@ class CommentHooksSniff implements Sniff
             }
 
             if (true === $correctly_placed) {
-
                 if (\T_COMMENT === $tokens[ $previous_comment ]['code']) {
                     $phpcsFile->addError(
                         'A "hook" comment must be a "/**" style docblock comment.',
@@ -83,6 +82,17 @@ class CommentHooksSniff implements Sniff
                     // Iterate through each comment to check for "@since" tag.
                     foreach ($tokens[ $comment_start ]['comment_tags'] as $tag) {
                         if ($tokens[$tag]['content'] === '@since') {
+                            // Check if there is a version after the @since tag.
+                            if (! preg_match('/\d+\.\d+\.?\d?/', $tokens[$tag+2]['content'])) {
+                                $phpcsFile->addError(
+                                    'A "@since" tag was found but no version declared. Required format <x.x> or <x.x.x>',
+                                    $stackPtr,
+                                    'MissingSinceVersionComment'
+                                );
+
+                                return;
+                            }
+
                             return;
                         }
                     }
