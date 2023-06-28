@@ -3,12 +3,6 @@
     "description": "WooCommerce sniffs",
     "type": "phpcodesniffer-standard",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Claudio Sanches",
-            "email": "claudio@automattic.com"
-        }
-    ],
     "keywords": [
         "phpcs",
         "standards",
