@@ -28,11 +28,14 @@ class GetAvailableVariationsSniff implements Sniff
     /**
      * Returns an array of tokens this test wants to listen for.
      *
+     * Listens for object operators (->) which indicate instance method calls,
+     * rather than T_STRING which triggers for many token types.
+     *
      * @return array
      */
     public function register(): array
     {
-        return [T_STRING];
+        return [T_OBJECT_OPERATOR];
     }
 
     /**
@@ -45,25 +48,19 @@ class GetAvailableVariationsSniff implements Sniff
     {
         $tokens = $phpcsFile->getTokens();
 
+        // Find the method name after the operator.
+        $methodNamePtr = $phpcsFile->findNext(T_WHITESPACE, $stackPtr + 1, null, true);
+        if (false === $methodNamePtr || T_STRING !== $tokens[$methodNamePtr]['code']) {
+            return;
+        }
+
         // Check if this is our target method name.
-        if (self::METHOD_NAME !== $tokens[$stackPtr]['content']) {
+        if (self::METHOD_NAME !== $tokens[$methodNamePtr]['content']) {
             return;
         }
 
-        // Ensure this is a method call (preceded by -> or ::).
-        $prevToken = $phpcsFile->findPrevious(T_WHITESPACE, $stackPtr - 1, null, true);
-        if (false === $prevToken) {
-            return;
-        }
-
-        if (T_OBJECT_OPERATOR !== $tokens[$prevToken]['code']
-            && T_DOUBLE_COLON !== $tokens[$prevToken]['code']
-        ) {
-            return;
-        }
-
-        // Find the opening parenthesis.
-        $openParen = $phpcsFile->findNext(T_WHITESPACE, $stackPtr + 1, null, true);
+        // Find the opening parenthesis to confirm this is a method call.
+        $openParen = $phpcsFile->findNext(T_WHITESPACE, $methodNamePtr + 1, null, true);
         if (false === $openParen || T_OPEN_PARENTHESIS !== $tokens[$openParen]['code']) {
             return;
         }
@@ -77,7 +74,7 @@ class GetAvailableVariationsSniff implements Sniff
             $phpcsFile->addWarning(
                 'get_available_variations() defaults to the expensive \'array\' return type. '
                 . 'Consider using \'objects\' if you only need WC_Product_Variation objects.',
-                $stackPtr,
+                $methodNamePtr,
                 'DefaultArrayReturn'
             );
             return;
@@ -90,7 +87,7 @@ class GetAvailableVariationsSniff implements Sniff
                 $phpcsFile->addWarning(
                     'get_available_variations(\'array\') is expensive for products with many variations. '
                     . 'Consider using \'objects\' if you only need WC_Product_Variation objects.',
-                    $stackPtr,
+                    $methodNamePtr,
                     'ExplicitArrayReturn'
                 );
             }
