@@ -35,7 +35,7 @@ class GetAvailableVariationsSniff implements Sniff
      */
     public function register(): array
     {
-        return [T_OBJECT_OPERATOR];
+        return [T_OBJECT_OPERATOR, T_DOUBLE_COLON];
     }
 
     /**
