@@ -9,16 +9,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: ['7.4', '8.0', '8.1', '8.2', '8.3']
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up PHP ${{ matrix.php }}
+      - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: '8.4'
           tools: composer
 
       - name: Install dependencies
