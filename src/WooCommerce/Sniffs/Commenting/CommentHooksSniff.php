@@ -79,6 +79,14 @@ class CommentHooksSniff implements Sniff
                 } elseif (\T_DOC_COMMENT_CLOSE_TAG === $tokens[ $previous_comment ]['code']) {
                     $comment_start = $phpcsFile->findPrevious(\T_DOC_COMMENT_OPEN_TAG, ( $previous_comment - 1 ));
 
+                    // Accept "This filter/action is documented in ..." cross-reference comments
+                    // as a valid alternative to a full docblock. This follows the WordPress core
+                    // convention for hooks that are documented elsewhere.
+                    $comment_text = $phpcsFile->getTokensAsString($comment_start, ( $previous_comment - $comment_start + 1 ));
+                    if (preg_match('/This (filter|action) is documented in/', $comment_text)) {
+                        return;
+                    }
+
                     // Iterate through each comment to check for "@since" tag.
                     foreach ($tokens[ $comment_start ]['comment_tags'] as $tag) {
                         if ($tokens[$tag]['content'] === '@since') {
