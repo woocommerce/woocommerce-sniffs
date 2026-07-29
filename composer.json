@@ -14,7 +14,7 @@
         "php": ">=7.2",
         "wp-coding-standards/wpcs": "^3.4.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
-        "phpcompatibility/phpcompatibility-wp": "^2.1.0"
+        "phpcompatibility/phpcompatibility-wp": "^2.1.7"
     },
     "config": {
         "allow-plugins": {
